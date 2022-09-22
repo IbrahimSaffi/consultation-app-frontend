@@ -1,6 +1,10 @@
 import React from 'react'
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { useNavigate } from "react-router-dom"
 
 export default function SignupPage() {
+  let goTo = useNavigate()
     const SignupSchema = Yup.object().shape({
         firstName: Yup.string()
           .min(3, 'Too Short!')
@@ -30,16 +34,16 @@ export default function SignupPage() {
     //Some bug here, Will debug
     onSubmit={
       values => {
-        console.log("here")
-        console.log(values)
-        try{
-          let name = values.firstName+" "+values.lastName
-          values.name = name
-            dispatch(createUser(values)).then(()=>goTo("/login")).catch(err=>dispatch(setError(err.message)))
-        }
-        catch(err){
-           console.log(err)
-        }
+        // console.log("here")
+        // console.log(values)
+        // try{
+        //   let name = values.firstName+" "+values.lastName
+        //   values.name = name
+        //     dispatch(createUser(values)).then(()=>goTo("/login")).catch(err=>dispatch(setError(err.message)))
+        // }
+        // catch(err){
+        //    console.log(err)
+        // }
       }
     }
   >

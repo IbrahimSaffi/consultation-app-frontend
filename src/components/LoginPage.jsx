@@ -1,6 +1,10 @@
 import React from 'react'
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { useNavigate } from "react-router-dom"
 
 export default function LoginPage() {
+    let goTo = useNavigate()
     const LoginSchema = Yup.object().shape({
         email: Yup.string().email('Invalid email').required('Required'),
         password: Yup.string().min(6, "Password should be atleast 6 letter long").required('Password is required'),
@@ -35,7 +39,9 @@ export default function LoginPage() {
                     </Form>
                 )}
             </Formik>
+            <p>Forgot Password? <button onClick={()=>goTo("/reset")} >Reset Password</button></p>
             <p>No Account? <button onClick={() => goTo("/signup")} >Create Account</button></p>
+
         </div>
     )
 }

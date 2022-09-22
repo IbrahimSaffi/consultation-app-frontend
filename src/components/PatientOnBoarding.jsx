@@ -1,5 +1,6 @@
 import React from 'react'
-
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 export default function PatientOnBoarding() {
   const PatientOnBoardingScheme = Yup.object().shape({
     city: Yup.string()
@@ -14,7 +15,7 @@ export default function PatientOnBoarding() {
     weight: Yup.string().required('Required'),
   });
   return (
-    <div className='signup'>
+    <div className='onboarding'>
       <Formik
         initialValues={{
           city: '',
@@ -25,7 +26,7 @@ export default function PatientOnBoarding() {
           age: "",
 
         }}
-        validationSchema={SignupSchema}
+        validationSchema={PatientOnBoardingScheme}
         //Some bug here, Will debug
         onSubmit={
           values => {
@@ -95,12 +96,6 @@ export default function PatientOnBoarding() {
           </Form>
         )}
       </Formik>
-      <div className='row' >
-        <p>
-          Already a user?
-        </p>
-        <button onClick={() => goTo("/login")} >Login</button>
-      </div>
     </div>
   )
 }
