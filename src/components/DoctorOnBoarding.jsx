@@ -5,9 +5,10 @@ import Multiselect from 'multiselect-react-dropdown';
 export default function DoctorOnBoarding() {
   const [qualificationsRef, setQualifictionsRef] = useState([])
   const [specialitiesRef, setSpecialitiesRef] = useState([])
+  const [slotsRef, setSlotsRef] = useState([])
   const [qualificationsFields, setQualifictionsFields] = useState([0])
   const [specialitiesFields, setSpecialitiesFields] = useState([0])
-  const [selected,setSelected] = useState([{name: 'All Week Days', id: 0}])
+  const [slotsFields, setSlotsFields] = useState([0])
   useEffect(() => {
     let tempRefs = specialitiesFields.map((option, i) => createRef())
     setSpecialitiesRef(tempRefs)
@@ -16,6 +17,10 @@ export default function DoctorOnBoarding() {
     let tempRefs = qualificationsFields.map((option, i) => createRef())
     setQualifictionsRef(tempRefs)
   }, [qualificationsFields])
+  useEffect(()=>{
+    let tempRefs = slotsFields.map((option, i) => createRef())
+    setSlotsRef(tempRefs)
+  },[slotsFields])
   function addQualificationField() {
     let currQualificationFields = qualificationsFields.slice()
     currQualificationFields.push(0)
@@ -25,6 +30,12 @@ export default function DoctorOnBoarding() {
     let currSpecialityFields = specialitiesFields.slice()
     currSpecialityFields.push(0)
     setSpecialitiesFields(currSpecialityFields)
+  }
+  function addSlotsField() {
+    let currSlotFields = slotsFields.slice()
+    console.log(currSlotFields)
+    currSlotFields.push(0)
+    setSlotsFields(currSlotFields)
   }
  function onSelect(selectedList, selectedItem) {
     if(selectedItem.name==="All Week Days"){
@@ -45,7 +56,7 @@ export default function DoctorOnBoarding() {
     }
     else{
       selectedList =[]
-      selected.push(selectedItem)
+      selectedList.push(selectedItem)
     }
 
 }
@@ -106,12 +117,12 @@ function onRemove(selectedList, removedItem) {
             <div className="box">
               <div>Qualifications</div>
               {qualificationsFields.map((qualificationsField, i) => <input ref={qualificationsRef[i]} type="text" />)}
-              <button onClick={() => addQualificationField()} >Add More</button>
+              <button type='button'  onClick={() => addQualificationField()} >Add More</button>
             </div>
             <div className="box">
               <div>Specializations</div>
               {specialitiesFields.map((specialitiesField, i) => <input ref={specialitiesRef[i]} type="text" />)}
-              <button onClick={() => addSpecialityField()} >Add More</button>
+              <button type='button'  onClick={() => addSpecialityField()} >Add More</button>
             </div>
             <div className="row">
               <div className="box">
@@ -123,7 +134,7 @@ function onRemove(selectedList, removedItem) {
               </div>
               <div className="box">
                 <div>Available Times</div>
-                <div className="row">
+              {slotsFields.map(slotField=><div className="row">
                   <div className="box">
                     <div>From</div>
                     <input type="time" />
@@ -140,15 +151,8 @@ function onRemove(selectedList, removedItem) {
                     onRemove={onRemove} // Function will trigger on remove event
                     displayValue="name" // Property name to display in the dropdown options
                   />
-                  {/* <select name="days" multiple={true}>
-                  <option value="All Week Days">All Week Days</option>
-                    <option value="Monday">Monday</option>
-                    <option value="Tuesday">Tuesday</option>
-                    <option value="Wednesday">Wednesday</option>
-                    <option value="Thursday">Thursday</option>
-                    <option value="Friday">Friday</option>
-                  </select> */}
-                </div>
+                </div>)}
+                  <button type='button' onClick={()=>addSlotsField()} >Add More</button>
               </div>
             </div>
             <div className="row">

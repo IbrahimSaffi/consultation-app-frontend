@@ -1,0 +1,109 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+.signuppage,.loginpage{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    flex-direction: row;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.signuppage img,.loginpage img{
+    width: 50%;
+    height: 100%;
+}
+
+.signup ,.login{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    padding: 100px;
+    text-align: center;
+}
+.form{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 20px;
+    text-align: left;
+}
+.row{
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+.box {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.onboarding{
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.onboarding .form{
+    background-color: #F7F8F9;
+    width: 80%;
+    min-height: 50%;
+    padding: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.doctors-page{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+.filter{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 20vw;
+    height: 100vh;
+}
+.doctors{
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+.doctor-card{
+    display: flex;
+    flex-direction: row;
+    width:30%;
+}
+.left ,.right{
+    display: flex;
+    flex-direction: column;
+}
+.right .row{
+    justify-self: left;
+    gap: 0px;
+}
+.right .row *::after{
+  content: ",";
+}
+.col {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}

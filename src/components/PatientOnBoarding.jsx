@@ -1,7 +1,29 @@
-import React from 'react'
+import React, { createRef, useEffect, useState } from 'react'
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import Multiselect from 'multiselect-react-dropdown';
 export default function PatientOnBoarding() {
+  const [diseasesRef, setDiseasesRef] = useState([])
+  const [diseasesFields, setDiseasesFields] = useState([0])
+  const [yearsRef, setYearsRef] = useState([])
+  
+  useEffect(() => {
+    let tempRefs = diseasesFields.map((option, i) => createRef())
+    console.log(tempRefs)
+    setDiseasesRef(tempRefs)
+    setYearsRef(tempRefs)
+  }, [diseasesFields])
+  function addDiseasesField() {
+    let currDiseasesFields = diseasesFields.slice()
+    currDiseasesFields.push(0)
+    setDiseasesFields(currDiseasesFields)
+  }
+  function onSelect() {
+
+  }
+  function onRemove() {
+
+  }
   const PatientOnBoardingScheme = Yup.object().shape({
     city: Yup.string()
       .min(3, 'Too Short!')
@@ -15,7 +37,8 @@ export default function PatientOnBoarding() {
     weight: Yup.string().required('Required'),
   });
   return (
-    <div className='onboarding'>
+    <div style={{backgroundImage:"url(./bg.jfif)"}} className='onboarding'>
+      <h1>Tell us about your self</h1>
       <Formik
         initialValues={{
           city: '',
@@ -30,6 +53,7 @@ export default function PatientOnBoarding() {
         //Some bug here, Will debug
         onSubmit={
           values => {
+            let diseases
             console.log(values)
           }
         }
@@ -52,8 +76,8 @@ export default function PatientOnBoarding() {
                 ) : null}
               </div>
               <div className="box">
-                <Field name="contactnumber" type="number" />
                 <div>Contact Number</div>
+                <Field name="contactnumber" type="number" />
                 {errors.contactnumber && touched.contactnumber ? (
                   <div>{errors.contactnumber}</div>
                 ) : null}
@@ -61,9 +85,13 @@ export default function PatientOnBoarding() {
 
             </div>
             <div className="box">
-              <div>Past Diseases</div>
-              {/* <Field name="email" type="email" />
-          {errors.email && touched.email ? <div>{errors.email}</div> : null} */}
+              <div>Past Health Issues</div>
+              {diseasesFields.map((diseasesField, i) => <div className="row">
+                {console.log(diseasesRef[i])}
+                <input ref={diseasesRef[i]} type="text" />
+                <input ref={yearsRef[i]} type="text" />
+              </div>)}
+              <button onClick={() => addDiseasesField()} type='button' >Add More</button>
             </div>
             <div className="row">
               <div className="box">
@@ -80,6 +108,7 @@ export default function PatientOnBoarding() {
                   <div>{errors.weight}</div>
                 ) : null}
               </div>
+              <div>Age</div>
               <div className="box">
                 <Field name="age" type="number" />
                 {errors.age && touched.age ? (
@@ -88,10 +117,18 @@ export default function PatientOnBoarding() {
               </div>
               <div className="box">
                 <div>Gender</div>
+                <Multiselect
+                  options={[{ name: 'Male', id: 1 }, { name: 'Female', id: 2 }, { name: 'Other', id: 3 }]} // Options to display in the dropdown
+                  selectedValues={{ name: 'Male', id: 1 }} // Preselected value to persist in dropdown
+                  onSelect={onSelect} // Function will trigger on select event
+                  onRemove={onRemove} // Function will trigger on remove event
+                  displayValue="name" // Property name to display in the dropdown options
+                  singleSelect={true}
+                />
               </div>
             </div>
             <div className="row">
-            <button type='submit' onClick={() => console.log("clicked")}>Save</button>
+              <button type='submit' onClick={() => console.log("clicked")}>Save</button>
             </div>
           </Form>
         )}

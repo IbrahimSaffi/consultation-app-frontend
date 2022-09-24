@@ -1,6 +1,6 @@
 import './App.css';
 import Header from './components/Header';
-import { Routes,Route} from 'react-router-dom';
+import { Routes,Route,useNavigate} from 'react-router-dom';
 import DoctorsProfile from './components/DoctorsProfile';
 import PatientsProfile from './components/PatientsProfile';
 import Doctors from './components/Doctors';
@@ -12,20 +12,45 @@ import PatientOnBoarding from './components/PatientOnBoarding';
 import DoctorOnBoarding from './components/DoctorOnBoarding';
 import { useSelector } from 'react-redux';
 import ResetPassword from './components/ResetPassword';
+import { useEffect } from 'react';
 
 function App() {
     let state = useSelector(state=>state.mainSlice)
+    let goTo = useNavigate()
+    useEffect(()=>{
+       if(!state.profile){
+        goTo("/login")
+       }
+       else if(state.profile){
+        if(!state.profile.location&&!state.profile.gender){
+          goTo("/onboarding")
+        }
+        else{
+          // if(state.profile.type==="doctor"){
+          //   goTo("/profile")
+          // }
+          // else{
+            goTo("/")
+          // }
+        }
+       }
+    },[state.profile])
   return (
     <div className="app">
     <Header/>
     <Routes>
-      {/* <Route path='/profile' element={
+    {/* <Route path='/onboarding' element={<DoctorOnBoarding/>}/> */}
+    {/* <Route path='/onboarding' element={<PatientOnBoarding/>}/> */}
+      {/* {state.profile?
+      <Route path='/profile' element={
         state.profile.type==="doctor"?<DoctorsProfile/>:<PatientsProfile/>
-        }/> */}
+        }/>:null} */}
       <Route path='/' element={<Doctors/>}/>
-      <Route path='/onboarding' element={
-        state.profile.type==="doctor"?<PatientOnBoarding/>:<DoctorOnBoarding/>
-        }/>
+      {state.profile?
+        <Route path='/onboarding' element={
+          state.profile.type==="doctor"?<DoctorOnBoarding/>:<PatientOnBoarding/>
+          }/>:null
+      }
       <Route path='/login' element={<LoginPage/>}/>
       <Route path='/signup' element={<SignupPage/>}/>
       <Route path='/patient/:id' element={<ViewPatient/>}/>

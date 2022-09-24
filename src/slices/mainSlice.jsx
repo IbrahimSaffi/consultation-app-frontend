@@ -94,7 +94,8 @@ export const getDoctors = createAsyncThunk(
         let res = await fetch(baseURL + "doctor", {
             method: "GET",
             headers: {
-                Authorization: 'Bearer ' + token,
+                // Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJpYnJhaGltc2FmZmluZXcyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDU2IiwiaWF0IjoxNjY0MDI0ODQ5LCJleHAiOjE2NjQwMjg0NDl9.AVy-ZPH6F72M8tGWcWksbZT5Yc_W9pVAU37dsAHtx4I",
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
@@ -367,7 +368,8 @@ let mainSlice = createSlice({
         })
         builder.addCase(getDoctors.fulfilled, (state, action) => {
             state.loading = false
-            state.doctors = action.payload.data
+            console.log(action.payload)
+            state.doctors = action.payload
         })
         builder.addCase(getSpecificPatient.pending, (state, action) => {
             state.loading = true
