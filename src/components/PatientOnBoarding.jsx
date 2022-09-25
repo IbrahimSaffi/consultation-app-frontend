@@ -1,12 +1,16 @@
-import React, { createRef, useEffect, useState } from 'react'
+import React, { createRef, useEffect, useRef, useState } from 'react'
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Multiselect from 'multiselect-react-dropdown';
+import { useDispatch, useSelector } from 'react-redux';
+import mainSlice, { updatePatient } from '../slices/mainSlice';
 export default function PatientOnBoarding() {
   const [diseasesRef, setDiseasesRef] = useState([])
   const [diseasesFields, setDiseasesFields] = useState([0])
   const [yearsRef, setYearsRef] = useState([])
-  
+  let dispatch = useDispatch(mainSlice)
+  let state = useSelector(state=>state.mainSlice)
+ let genderRef = useRef()
   useEffect(() => {
     let tempRefs = diseasesFields.map((option, i) => createRef())
     console.log(tempRefs)
@@ -35,9 +39,11 @@ export default function PatientOnBoarding() {
       .required('Required'),
     bloodgroup: Yup.string().required('Required'),
     weight: Yup.string().required('Required'),
+    age:Yup.number().required('Required'),
+    contactnumber:Yup.string().required('Required')
   });
   return (
-    <div style={{backgroundImage:"url(./bg.jfif)"}} className='onboarding'>
+    <div style={{ backgroundImage: "url(./bg.jfif)" }} className='onboarding'>
       <h1>Tell us about your self</h1>
       <Formik
         initialValues={{
@@ -47,14 +53,18 @@ export default function PatientOnBoarding() {
           bloodgroup: '',
           weight: '',
           age: "",
-
         }}
         validationSchema={PatientOnBoardingScheme}
-        //Some bug here, Will debug
         onSubmit={
           values => {
-            let diseases
-            console.log(values)
+            values.pastDiseases = JSON.stringify(diseasesRef.map((diseaseRef, i) => {
+              return {
+                disease: diseaseRef.current.value,
+                years: yearsRef[i].current.value
+              }
+            }))
+           values.gender= genderRef.current.getSelectedItems()[0].name
+           dispatch(updatePatient({dataValues:values,id:state.profile.id})).then(()=>console.log("success")).catch(err=>console.log(err))
           }
         }
       >
@@ -77,7 +87,7 @@ export default function PatientOnBoarding() {
               </div>
               <div className="box">
                 <div>Contact Number</div>
-                <Field name="contactnumber" type="number" />
+                <Field name="contactnumber" />
                 {errors.contactnumber && touched.contactnumber ? (
                   <div>{errors.contactnumber}</div>
                 ) : null}
@@ -87,7 +97,6 @@ export default function PatientOnBoarding() {
             <div className="box">
               <div>Past Health Issues</div>
               {diseasesFields.map((diseasesField, i) => <div className="row">
-                {console.log(diseasesRef[i])}
                 <input ref={diseasesRef[i]} type="text" />
                 <input ref={yearsRef[i]} type="text" />
               </div>)}
@@ -117,7 +126,7 @@ export default function PatientOnBoarding() {
               </div>
               <div className="box">
                 <div>Gender</div>
-                <Multiselect
+                <Multiselect ref={genderRef}
                   options={[{ name: 'Male', id: 1 }, { name: 'Female', id: 2 }, { name: 'Other', id: 3 }]} // Options to display in the dropdown
                   selectedValues={{ name: 'Male', id: 1 }} // Preselected value to persist in dropdown
                   onSelect={onSelect} // Function will trigger on select event

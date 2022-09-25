@@ -38,6 +38,7 @@ export default function LoginPage() {
                     validationSchema={LoginSchema}
                     onSubmit={
                         values => {
+                            values.type = selected
                             dispatch(login(values)).then(() => goTo("/onboarding"))
                                 .catch(err => console.log(err))
                         }

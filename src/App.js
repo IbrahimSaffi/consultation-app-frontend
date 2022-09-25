@@ -48,7 +48,7 @@ function App() {
       <Route path='/' element={<Doctors/>}/>
       {state.profile?
         <Route path='/onboarding' element={
-          state.profile.type==="doctor"?<DoctorOnBoarding/>:<PatientOnBoarding/>
+          state.profile.type.toLowerCase()==="doctor"?<DoctorOnBoarding/>:<PatientOnBoarding/>
           }/>:null
       }
       <Route path='/login' element={<LoginPage/>}/>

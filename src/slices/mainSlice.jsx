@@ -74,7 +74,7 @@ export const updateInformationDoctor = createAsyncThunk(
                 Authorization: 'Bearer ' + token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(data.dataValues),
         })
         if (res.status !== 200) {
             let e = await res.json()
@@ -94,9 +94,7 @@ export const getDoctors = createAsyncThunk(
         let res = await fetch(baseURL + "doctor", {
             method: "GET",
             headers: {
-                // Authorization: 'Bearer ' + token,
-                Authorization: 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJpYnJhaGltc2FmZmluZXcyQGdtYWlsLmNvbSIsInBhc3N3b3JkIjoiMTIzNDU2IiwiaWF0IjoxNjY0MDI0ODQ5LCJleHAiOjE2NjQwMjg0NDl9.AVy-ZPH6F72M8tGWcWksbZT5Yc_W9pVAU37dsAHtx4I",
-                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
             },
             body: JSON.stringify(data),
         })
@@ -144,7 +142,7 @@ export const updatePatient = createAsyncThunk(
                 Authorization: 'Bearer ' + token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(data.dataValues),
         })
         if (res.status !== 200) {
             let e = await res.json()
@@ -345,6 +343,7 @@ let mainSlice = createSlice({
         builder.addCase(updateInformationDoctor.fulfilled, (state, action) => {
             state.loading = false
             state.profile = action.payload.data
+            localStorage.setItem("PROFILE", action.payload.data)
         })
         builder.addCase(updatePatient.pending, (state, action) => {
             state.loading = true
