@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import mainSlice, { getDoctors } from '../slices/mainSlice'
+import mainSlice, { getDoctors, setCurrentViewedDoctor } from '../slices/mainSlice'
 import { useSelector, useDispatch } from 'react-redux';
 import Multiselect from 'multiselect-react-dropdown';
+import BookingPopUp from './BookingPopUp';
 
 export default function Doctors() {
   let state = useSelector(state => state.mainSlice)
@@ -15,6 +16,7 @@ export default function Doctors() {
   let [locations, setLocation] = useState([])
   let [specialities, setSpecialities] = useState([])
   let [qualifications, setQualifications] = useState([])
+  let [bookingDisplay,setBookingDisplay] = useState(false)
   function filterLocations(query) {
     if (!query) {
       let locationsObj = {}
@@ -79,9 +81,12 @@ export default function Doctors() {
     setSpecialitiesFunc()
     setQualificationFunc()
   }, [state.doctors])
-
+  function setPopup(bool){
+   setBookingDisplay(bool)
+  }
   return (
     <div className='doctors-page' >
+      <BookingPopUp display={bookingDisplay} setPopup={setPopup}/>
       <div className="filter box">
         <div className="row">
           <input ref={searchInput} type="text" />
@@ -136,8 +141,8 @@ export default function Doctors() {
       </div>
       <div className="doctors">
         {filteredList.map((doctor, i) => {
-          return <div className='doctor-card'>
-            <div onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className="left">
+          return <div onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className='doctor-card'>
+            <div  className="left">
               <h1>{doctor.name}</h1>
               <p>{doctor.specialities !== null ? doctor.specialities[0] : null}</p>
               <p>{doctor.location}</p>
@@ -167,7 +172,12 @@ export default function Doctors() {
                   {doctor.cost}
                 </p>
               </div>
-              <button>Book</button>
+              <button onClick={()=>{
+                setPopup(true)
+                console.log(i)
+                console.log(state.doctors)
+                dispatch(setCurrentViewedDoctor(i))
+                }}>Book</button>
               <button>View Profile</button>
             </div>
           </div>

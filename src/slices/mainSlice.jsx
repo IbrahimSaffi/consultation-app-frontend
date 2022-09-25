@@ -225,17 +225,16 @@ export const prescribePatient = createAsyncThunk(
 )
 export const getAllBookingsDoctor = createAsyncThunk(
     " get / doctor /consultations",
-    async (data, { getState }) => {
-        console.log(data)
+    async (id, { getState }) => {
+        console.log(id)
         //Doctor id
         let token = getState().mainSlice.accessToken
-        let res = await fetch(baseURL + "consultation/doctor/" + data.id, {
-            method: "POST",
+        let res = await fetch(baseURL + "consultation/doctor/" + id, {
+            method: "GET",
             headers: {
                 Authorization: 'Bearer ' + token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
         })
         if (res.status !== 200) {
             let e = await res.json()
@@ -281,11 +280,15 @@ let mainSlice = createSlice({
         doctors:[],
         currPatient:null,
         upcomingConsultations:[],
-        pastConsultations:[]
+        pastConsultations:[],
+        currentDoctor:null,
     },
     reducers: {
-       setError:(action,state)=>{
+       setError:(state,action)=>{
           state.error = action.payload
+       },
+       setCurrentViewedDoctor:(state,action)=>{
+        state.currentDoctor = state.doctors[action.payload]
        }
     },
     extraReducers: (builder) => {
@@ -447,5 +450,5 @@ let mainSlice = createSlice({
         })
     }
 })
-export const { } = mainSlice.actions
+export const {setCurrentViewedDoctor,setError } = mainSlice.actions
 export default mainSlice.reducer

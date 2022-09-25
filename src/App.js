@@ -22,16 +22,11 @@ function App() {
         goTo("/login")
        }
        else if(state.profile){
-        if(!state.profile.location&&!state.profile.gender){
+        if(!state.profile.gender){
           goTo("/onboarding")
         }
         else{
-          // if(state.profile.type==="doctor"){
-          //   goTo("/profile")
-          // }
-          // else{
             goTo("/")
-          // }
         }
        }
     },[state.profile])
@@ -57,6 +52,7 @@ function App() {
       {/* Booking will happen in following page */}
       <Route path='/doctor/:id' element={<ViewDoctor/>}/>
       <Route path='/reset' element={<ResetPassword/>}/>
+      
     </Routes>
     </div>
   );
