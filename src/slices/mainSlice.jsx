@@ -42,6 +42,27 @@ export const sendResetCode = createAsyncThunk(
 
     }
 )
+export const resetPass = createAsyncThunk(
+    "auth / reset / pass",
+    async (data) => {
+        console.log(data)
+        let res = await fetch(baseURL + "auth/reset-pass", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        if (res.status !== 200) {
+            let e = await res.json()
+            throw new Error(e.error)
+        }
+        else {
+            return res.json()
+        }
+
+    }
+)
 export const login = createAsyncThunk(
     "auth / login",
     async (data) => {
@@ -555,6 +576,17 @@ let mainSlice = createSlice({
             state.pastConsultations =action.payload.filter(consultation=>consultation.status==="Completed")
             state.upcomingConsultations =action.payload.filter(consultation=>consultation.status==="Upcoming")
             console.log(state.pastConsultations)
+        })
+        builder.addCase(resetPass.pending, (state, action) => {
+            state.loading = true
+            // state.error = ""
+        })
+        builder.addCase(resetPass.rejected, (state, action) => {
+            state.error = action.error.message
+            throw new Error(state.error)
+        })
+        builder.addCase(resetPass.fulfilled, (state, action) => {
+            state.loading = false
         })
     }
 })

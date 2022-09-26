@@ -3,7 +3,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import mainSlice, { sendResetCode, setError } from '../slices/mainSlice';
+import mainSlice, { resetPass, sendResetCode, setError } from '../slices/mainSlice';
 import { useRef } from 'react';
 export default function ResetPassword() {
  let [displayFields,setDisplayFields] = useState(false)
@@ -28,10 +28,10 @@ export default function ResetPassword() {
       confirmPassword: '',
     }}
     validationSchema={ResetSchema}
-    //Some bug here, Will debug
     onSubmit={
       values => {
-          console.log(values)
+        //Although Was Fully function when tested with postman cannot test with frontend because mailgun has banned account
+          dispatch(resetPass({email:values.email,newPassword:values.password,code:values.resetCode}))
           }
         }
         >
