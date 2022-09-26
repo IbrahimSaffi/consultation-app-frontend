@@ -30,7 +30,7 @@ export default function ResetPassword() {
     validationSchema={ResetSchema}
     onSubmit={
       values => {
-        //Although Was Fully function when tested with postman cannot test with frontend because mailgun has banned account
+        //Although Was Fully functional when tested with postman cannot test with frontend because mailgun has banned account
           dispatch(resetPass({email:values.email,newPassword:values.password,code:values.resetCode}))
           }
         }
