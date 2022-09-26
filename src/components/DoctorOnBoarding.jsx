@@ -2,10 +2,17 @@ import React, { createRef, useEffect, useState } from 'react'
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import Multiselect from 'multiselect-react-dropdown';
-import { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import mainSlice, { updateInformationDoctor } from '../slices/mainSlice';
+import mainSlice, { getDoctors, setError, updateInformationDoctor } from '../slices/mainSlice';
+import { useNavigate} from 'react-router-dom';
+
 export default function DoctorOnBoarding() {
+  let goTo = useNavigate()
+  useEffect(()=>{
+   if(state.profile.location){
+      goTo("/profile")
+   }
+  },[])
   const [qualificationsRef, setQualifictionsRef] = useState([])
   const [specialitiesRef, setSpecialitiesRef] = useState([])
   const [slotsRefFrom, setSlotsFromRef] = useState([])
@@ -87,7 +94,7 @@ export default function DoctorOnBoarding() {
     experience: Yup.number().required('Required'),
   });
   return (
-    <div className='onboarding'>
+    <div style={{ backgroundImage: "url(./bg.jfif)" }}  className='onboarding'>
       <Formik
         initialValues={{
           hospital: '',
@@ -111,7 +118,7 @@ export default function DoctorOnBoarding() {
               })
             })
             values.availableSlots = JSON.stringify(slotsObj)
-           dispatch(updateInformationDoctor({id:state.profile.id ,dataValues:values})).then(()=>console.log("success")).catch((err)=>console.log(err))
+           dispatch(updateInformationDoctor({id:state.profile.id ,dataValues:values})).then(()=>console.log("success")).catch((err)=>dispatch(setError(err.message)))
           }
         }
       >
@@ -122,44 +129,44 @@ export default function DoctorOnBoarding() {
                 <div>Hospital</div>
                 <Field name="hospital" />
                 {errors.hospital && touched.hospital ? (
-                  <div>{errors.hospital}</div>
+                  <div className='inp-err'>{errors.hospital}</div>
                 ) : null}
               </div>
               <div className="box">
                 <div>Location</div>
                 <Field name="location" />
                 {errors.location && touched.location ? (
-                  <div>{errors.location}</div>
+                  <div className='inp-err'>{errors.location}</div>
                 ) : null}
               </div>
               <div className="box">
                 <div>Cost</div>
                 <Field name="cost" />
                 {errors.cost && touched.cost ? (
-                  <div>{errors.cost}</div>
+                  <div className='inp-err'>{errors.cost}</div>
                 ) : null}
               </div>
             </div>
             <div className="box">
               <div>Qualifications</div>
               {qualificationsFields.map((qualificationsField, i) => <input ref={qualificationsRef[i]} type="text" />)}
-              <button type='button' onClick={() => addQualificationField()} >Add More</button>
+              <button className='submit-btn self-center' type='button' onClick={() => addQualificationField()} >Add More</button>
             </div>
             <div className="box">
               <div>Specializations</div>
               {specialitiesFields.map((specialitiesField, i) => <input ref={specialitiesRef[i]} type="text" />)}
-              <button type='button' onClick={() => addSpecialityField()} >Add More</button>
+              <button className='submit-btn self-center' type='button' onClick={() => addSpecialityField()} >Add More</button>
             </div>
             <div className="row">
               <div className="box">
                 <div>Experience</div>
                 <Field name="experience" />
                 {errors.experience && touched.experience ? (
-                  <div>{errors.experience}</div>
+                  <div className='inp-err'>{errors.experience}</div>
                 ) : null}
               </div>
-              <div className="box">
                 <div>Available Times</div>
+              <div className="box slots-onboarding">
                 {slotsFields.map((slotField, i) => <div className="row">
                   <div className="box">
                     <div>From</div>
@@ -178,11 +185,11 @@ export default function DoctorOnBoarding() {
                     displayValue="name" // Property name to display in the dropdown options
                   />
                 </div>)}
-                <button type='button' onClick={() => addSlotsField()} >Add More</button>
+                <button className='submit-btn self-center' type='button' onClick={() => addSlotsField()} >Add More</button>
               </div>
             </div>
             <div className="row">
-              <button type='submit' onClick={() => console.log("clicked")}>Save</button>
+              <button className='submit-btn self-center' type='submit' onClick={() => console.log("clicked")}>Save</button>
             </div>
           </Form>
         )}

@@ -3,7 +3,8 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux';
-import mainSlice, { createUser } from '../slices/mainSlice';
+import mainSlice, { createUser, setError } from '../slices/mainSlice';
+import Logo from './Logo';
 
 export default function SignupPage() {
   let goTo = useNavigate()
@@ -23,8 +24,9 @@ export default function SignupPage() {
   return (
     <div className="signuppage">
     <div className='signup'> 
-    <h1>Join Doc Seek</h1>
-    <p>Your end to end Medical Care Partner</p>
+    <Logo/>
+    <h1 className='auth-heading' >Join Doc Seek</h1>
+    <p className='auth-label' >Your end to end Medical Care Partner</p>
     <Formik
     initialValues={{
       name: '',
@@ -33,19 +35,10 @@ export default function SignupPage() {
       confirmPassword: '',
     }}
     validationSchema={SignupSchema}
-    //Some bug here, Will debug
     onSubmit={
       values => {
         values.type = type
-        dispatch(createUser(values)).then(()=>goTo("/login")).catch(err=>console.log(err))
-        // try{
-          //   let name = values.firstName+" "+values.lastName
-          //   values.name = name
-          //     dispatch(createUser(values)).then(()=>goTo("/login")).catch(err=>dispatch(setError(err.message)))
-          // }
-          // catch(err){
-            //    console.log(err)
-            // }
+        dispatch(createUser(values)).then(()=>goTo("/login")).catch((err)=>dispatch(setError(err.message)))
           }
         }
         >
@@ -55,31 +48,33 @@ export default function SignupPage() {
         <div>Name</div>
         <Field name="name" />
         {errors.name && touched.name ? (
-          <div>{errors.name}</div>
+          <div className='inp-err' >{errors.name}</div>
           ) : null}
         </div>
         <div className="box">
         <div>Enter Email</div>
         <Field name="email" type="email" />
-        {errors.email && touched.email ? <div>{errors.email}</div> : null}
+        {errors.email && touched.email ? <div className='inp-err' >{errors.email}</div> : null}
         <div>Enter Password</div>
         </div>
         <div className="box">
         <Field name="password" type="password" />
         {errors.password && touched.password ? (
-          <div>{errors.password}</div>
+          <div className='inp-err' >{errors.password}</div>
           ) : null}
         </div>
         <div className="box">
         <div>Confirm Password</div>
         <Field name="confirmPassword" type="password" />
         {errors.confirmPassword && touched.confirmPassword ? (
-          <div>{errors.confirmPassword}</div>
+          <div className='inp-err' >{errors.confirmPassword}</div>
           ) : null}
         </div>
-        <button type='button' style={{backgroundColor:type==="Doctor"?"wheat":"white"}} onClick={()=>setType("Doctor")}>Doctor</button>
-        <button type='button' style={{backgroundColor:type==="Patient"?"wheat":"white"}} onClick={()=>setType("Patient")}>Patient</button>
-        <button type='submit' onClick={() => console.log("clicked")}>Sign Up</button>
+        <div className="centered-row">
+        <button className={type==="Doctor"?'select-btn selected':"select-btn"} type='button' onClick={()=>setType("Doctor")}>Doctor</button>
+        <button className={type==="Patient"?'select-btn selected':"select-btn"} type='button' onClick={()=>setType("Patient")}>Patient</button>
+        </div>
+        <button className='submit-btn' type='submit' onClick={() => console.log("clicked")}>Sign Up</button>
       </Form>
     )}
   </Formik>
@@ -87,7 +82,7 @@ export default function SignupPage() {
     <p>
       Already a user?
     </p>
-      <button onClick={() => goTo("/login")} >Login</button>
+      <button className='nav-btn' onClick={() => goTo("/login")} >Login</button>
   </div>
   </div>
   <img src="./sideimg.jfif" alt="" />

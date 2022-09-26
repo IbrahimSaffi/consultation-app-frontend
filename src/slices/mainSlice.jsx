@@ -1,10 +1,31 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
 let baseURL = "http://localhost:8000/"
 export const createUser = createAsyncThunk(
     "auth / signup",
     async (data) => {
         console.log(data)
         let res = await fetch(baseURL + "auth/signup", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        if (res.status !== 200) {
+            let e = await res.json()
+            throw new Error(e.error)
+        }
+        else {
+            return res.json()
+        }
+
+    }
+)
+export const sendResetCode = createAsyncThunk(
+    "auth / send / code",
+    async (data) => {
+        console.log(data)
+        let res = await fetch(baseURL + "auth/sendCode", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -110,16 +131,14 @@ export const getDoctors = createAsyncThunk(
 )
 export const getSpecificPatient = createAsyncThunk(
     " get / patient",
-    async (data, { getState }) => {
-        console.log(data)
+    async (id, { getState }) => {
         let token = getState().mainSlice.accessToken
-        let res = await fetch(baseURL + "patient/" + data.id, {
+        let res = await fetch(baseURL + "patient/" + id, {
             method: "GET",
             headers: {
                 Authorization: 'Bearer ' + token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
         })
         if (res.status !== 200) {
             let e = await res.json()
@@ -165,7 +184,7 @@ export const rateDoctor = createAsyncThunk(
                 Authorization: 'Bearer ' + token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(data.values),
         })
         if (res.status !== 200) {
             let e = await res.json()
@@ -211,7 +230,7 @@ export const prescribePatient = createAsyncThunk(
                 Authorization: 'Bearer ' + token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(data.values),
         })
         if (res.status !== 200) {
             let e = await res.json()
@@ -248,17 +267,16 @@ export const getAllBookingsDoctor = createAsyncThunk(
 )
 export const getAllBookingsPatient = createAsyncThunk(
     " get / patient/ consultations",
-    async (data, { getState }) => {
-        console.log(data)
+    async (id, { getState }) => {
+        console.log(id)
         //Patient id
         let token = getState().mainSlice.accessToken
-        let res = await fetch(baseURL + "consultation/patient/" + data.id, {
-            method: "POST",
+        let res = await fetch(baseURL + "consultation/patient/" + id, {
+            method: "GET",
             headers: {
                 Authorization: 'Bearer ' + token,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
         })
         if (res.status !== 200) {
             let e = await res.json()
@@ -282,6 +300,11 @@ let mainSlice = createSlice({
         upcomingConsultations:[],
         pastConsultations:[],
         currentDoctor:null,
+        availableSlots:null,
+        currSlotChips:[],
+        bookedSlots:{},
+        consultationsToDisplay : "upcoming",
+        feedbacksOfCurrDoc:[]
     },
     reducers: {
        setError:(state,action)=>{
@@ -289,7 +312,59 @@ let mainSlice = createSlice({
        },
        setCurrentViewedDoctor:(state,action)=>{
         state.currentDoctor = state.doctors[action.payload]
-       }
+       },
+       setConsultaionMode:(state,action)=>{
+        state.consultationsToDisplay = action.payload
+       },
+       calculateAvailableSlots:(state,action)=>{
+        let selectedDate = String(action.payload)
+        console.log(selectedDate)
+        if(state.currentDoctor){
+         let selectedDay = selectedDate.split(" ")[0]
+         if(selectedDay.toLocaleLowerCase()==="sat"||selectedDay.toLocaleLowerCase()==="sun"){
+            state.currSlotChips = []
+         }
+         else{
+             let availableSlots = JSON.parse(state.currentDoctor.availableSlots)
+             let slotsOnCurrentDay = []
+             for(let day in availableSlots){
+                if(day.startsWith(selectedDay)){
+                    slotsOnCurrentDay =availableSlots[day]
+                    break
+                }
+             }
+             let timeDivisions=[]
+             console.log(slotsOnCurrentDay)
+             slotsOnCurrentDay.forEach(range=>{
+               let startHour = range[0].split(":")[0]
+               let endHour = range[1].split(":")[0]
+               let startMinutes = range[0].split(":")[1]
+               let endMinutes = range[1].split(":")[1]
+               if(Number(endHour)>Number(startHour))
+               while((startHour<endHour||startMinutes<endMinutes)&&startHour<=24){
+                 let startTime = `${startHour}:${startMinutes}`
+                 if((Number(startMinutes)+30)<60){
+                     startMinutes = Number(startMinutes)+30
+                 }
+                else if((Number(startMinutes)+30)>=60){
+                    startMinutes = Number(startMinutes)+30-60
+                    startHour = Number(startHour)+1
+                }
+                if(String(startMinutes).length===1){
+                    startMinutes= "0"+startMinutes
+                }
+                if(String(startHour).length===1){
+                    startHour= "0"+startHour
+                }
+                let endTime = `${startHour}:${startMinutes}`
+                // console.log(startMinutes,)
+                timeDivisions.push([startTime,endTime])
+               }
+               state.currSlotChips = timeDivisions
+             })
+            }
+           }
+         }
     },
     extraReducers: (builder) => {
         builder.addCase(createUser.pending, (state, action) => {
@@ -298,12 +373,24 @@ let mainSlice = createSlice({
         })
         builder.addCase(createUser.rejected, (state, action) => {
             state.error = action.error.message
+            console.log(state.error)
             throw new Error(state.error)
         })
         builder.addCase(createUser.fulfilled, (state, action) => {
             state.loading = false
             // state.error = ""
-
+        })
+        builder.addCase(sendResetCode.pending, (state, action) => {
+            state.loading = true
+            // state.error = ""
+        })
+        builder.addCase(sendResetCode.rejected, (state, action) => {
+            state.error = action.error.message
+            throw new Error(state.error)
+        })
+        builder.addCase(sendResetCode.fulfilled, (state, action) => {
+            state.loading = false
+            // state.error = ""
         })
         builder.addCase(login.pending, (state, action) => {
             state.loading = true
@@ -383,7 +470,7 @@ let mainSlice = createSlice({
         })
         builder.addCase(getSpecificPatient.fulfilled, (state, action) => {
             state.loading = false
-            state.currPatient = action.payload.data
+            state.currPatient = action.payload
         })
         builder.addCase(rateDoctor.pending, (state, action) => {
             state.loading = true
@@ -395,6 +482,8 @@ let mainSlice = createSlice({
         })
         builder.addCase(rateDoctor.fulfilled, (state, action) => {
             state.loading = false
+            let index =state.pastConsultations.findIndex(cons=>cons.id===action.payload.id)
+            state.pastConsultations[index] = action.payload
         })
         builder.addCase(bookDoctor.pending, (state, action) => {
             state.loading = true
@@ -434,6 +523,24 @@ let mainSlice = createSlice({
             state.loading = false
             state.pastConsultations =action.payload.filter(consultation=>consultation.status==="Completed")
             state.upcomingConsultations =action.payload.filter(consultation=>consultation.status==="Upcoming")
+            let feedbacks = []
+            state.pastConsultations.forEach(booking=>{
+                if(booking.feedback){
+                    feedbacks.push([booking.feedback,booking.rating])
+                }
+            })
+            state.feedbacksOfCurrDoc = feedbacks
+           state.upcomingConsultations.forEach(booking=>{
+            let bookingObj = JSON.parse(booking.date)
+            let date = Object.keys(bookingObj)[0]
+            if(state.bookedSlots.hasOwnProperty(date)){
+                 state.bookedSlots[date].push(bookingObj[date])
+            }
+            else{
+                state.bookedSlots[date] = [bookingObj[date]]
+            }
+           })
+           console.log(current(state.bookedSlots))
         })
         builder.addCase(getAllBookingsPatient.pending, (state, action) => {
             state.loading = true
@@ -447,8 +554,9 @@ let mainSlice = createSlice({
             state.loading = false
             state.pastConsultations =action.payload.filter(consultation=>consultation.status==="Completed")
             state.upcomingConsultations =action.payload.filter(consultation=>consultation.status==="Upcoming")
+            console.log(state.pastConsultations)
         })
     }
 })
-export const {setCurrentViewedDoctor,setError } = mainSlice.actions
+export const {setCurrentViewedDoctor,setError,calculateAvailableSlots,setConsultaionMode} = mainSlice.actions
 export default mainSlice.reducer

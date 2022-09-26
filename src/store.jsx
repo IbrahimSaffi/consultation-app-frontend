@@ -4,10 +4,10 @@ const store = configureStore({
     reducer: {
         mainSlice: mainSlice
     },
-    // middleware: (getDefaultMiddleware) => getDefaultMiddleware({
-    //     serializableCheck: false
-    // }
-    // ),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        serializableCheck: false
+    }
+    ),
 
 })
 export default store

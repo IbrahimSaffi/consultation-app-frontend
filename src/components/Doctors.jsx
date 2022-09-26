@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
-import mainSlice, { getDoctors, setCurrentViewedDoctor } from '../slices/mainSlice'
+import mainSlice, { getAllBookingsDoctor, getDoctors, setCurrentViewedDoctor, setError } from '../slices/mainSlice'
 import { useSelector, useDispatch } from 'react-redux';
 import Multiselect from 'multiselect-react-dropdown';
 import BookingPopUp from './BookingPopUp';
+import { useNavigate } from "react-router-dom"
 
 export default function Doctors() {
   let state = useSelector(state => state.mainSlice)
@@ -17,6 +18,7 @@ export default function Doctors() {
   let [specialities, setSpecialities] = useState([])
   let [qualifications, setQualifications] = useState([])
   let [bookingDisplay,setBookingDisplay] = useState(false)
+  let goTo = useNavigate()
   function filterLocations(query) {
     if (!query) {
       let locationsObj = {}
@@ -73,7 +75,7 @@ export default function Doctors() {
     setFiltered(UpdatedfilteredList)
   }
   useEffect(() => {
-    dispatch(getDoctors())
+    dispatch(getDoctors()).catch((err)=>dispatch(setError(err.message)))
   }, [])
   useEffect(() => {
     setFiltered(state.doctors)
@@ -87,26 +89,29 @@ export default function Doctors() {
   return (
     <div className='doctors-page' >
       <BookingPopUp display={bookingDisplay} setPopup={setPopup}/>
-      <div className="filter box">
-        <div className="row">
+      <div style={{filter:bookingDisplay?"opacity(30%)":"opacity(100%)"}} className="filter box">
+        <div className="box search">
           <input ref={searchInput} type="text" />
           <button onClick={() => {
             filter()
           }} >Search</button>
         </div>
-        <div className="row">
+        <div className="box">
           <p>Location</p>
-          <input ref={locationRef} onChange={(e) => filterLocations(e.target.value)} type="text" name="" id="" />
+          <p className='border-p'>
+          <input className='no-border-inp' ref={locationRef} onChange={(e) => filterLocations(e.target.value)} type="text" name="" id="" />
           <button onClick={() => {
             filterLocations()
             locationRef.current.value = ""
             filter("location", "")
           }
           } >X</button>
-          <button>S</button>
+          {/* <button>S</button> */}
+          </p>
+          
         </div>
         <div className="dropdown">
-          {locations.map(location => <button onClick={() => {
+          {locations.map(location => <button className='submit-btn' onClick={() => {
             console.log(locationRef)
             locationRef.current.value = location
             filter()
@@ -123,6 +128,7 @@ export default function Doctors() {
             // onSelect={onSelect} // Function will trigger on select event
             // onRemove={onRemove} // Function will trigger on remove event
             displayValue="name" // Property name to display in the dropdown options
+            avoidHighlightFirstOption={true}
           />
         </div>
         <div className="box">
@@ -136,28 +142,31 @@ export default function Doctors() {
             // onSelect={onSelect} // Function will trigger on select event
             // onRemove={onRemove} // Function will trigger on remove event
             displayValue="name" // Property name to display in the dropdown options
+            avoidHighlightFirstOption={true}
           />
         </div>
       </div>
-      <div className="doctors">
+      <div  style={{filter:bookingDisplay?"opacity(30%)":"opacity(100%)"}}  className="doctors">
         {filteredList.map((doctor, i) => {
-          return <div onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className='doctor-card'>
+          if(doctor.location){
+          return <div onMouseEnter={() => setHovered(i)} onMouseLeave={() => setHovered(null)} className={hovered===i?'doctor-card hovered':'doctor-card'}>
             <div  className="left">
               <h1>{doctor.name}</h1>
               <p>{doctor.specialities !== null ? doctor.specialities[0] : null}</p>
               <p>{doctor.location}</p>
+              <p>{doctor.ratings?"Rating:"+doctor.ratings+"/5":"Not Rated Yet"}</p>
             </div>
             <div style={{ display: i === hovered ? "flex" : "none", width: i === hovered ? "50%" : "30%" }} className="right">
               <div className="box">
                 <h3>Degree</h3>
-                <div className="row">
-                  {doctor.qualifications.map(qualification => <span>{qualification}</span>)}
+                <div>
+                  {doctor.qualifications.map((qualification,i) => <span>{qualification}{i<doctor.qualifications.length-1?",":null}</span>)}
                 </div>
               </div>
               <div className="box">
                 <h3>Speciality</h3>
-                <div className="row">
-                  {doctor.specialities !== null ? doctor.specialities.map(speciality => <span>{speciality}</span>) : null}
+                <div>
+                  {doctor.specialities !== null ? doctor.specialities.map(speciality => <span>{speciality}{i<doctor.specialities.length-1?",":null}</span>) : null}
                 </div>
               </div>
               <div className="box">
@@ -172,15 +181,22 @@ export default function Doctors() {
                   {doctor.cost}
                 </p>
               </div>
-              <button onClick={()=>{
+              <div className="row">
+              <button className='nav-btn' onClick={()=>{
                 setPopup(true)
                 console.log(i)
                 console.log(state.doctors)
                 dispatch(setCurrentViewedDoctor(i))
+                dispatch(getAllBookingsDoctor(state.currentDoctor.id)).catch((err)=>dispatch(setError(err.message)))
                 }}>Book</button>
-              <button>View Profile</button>
+              <button className='nav-btn' onClick={()=>goTo(`/doctor/${i}`)}  >View Profile</button>
+              </div>
             </div>
           </div>
+          }
+          else{
+            return null
+          }
         })}
       </div>
     </div>
