@@ -339,12 +339,13 @@ filter: brightness(80%);
 }
 .consultations-container{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
     background-color: #F7F8F9;;
     min-height: 30vh;
+    gap: 20px;
 }
 .const-card{
     background-color: #22C55E;
@@ -353,6 +354,7 @@ filter: brightness(80%);
     padding: 20px;
     border-radius: 20px;
     text-align: center;
+    margin-bottom: 20px;
 }
 .const-card button{
     padding: 10px;
