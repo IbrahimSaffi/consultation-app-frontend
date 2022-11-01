@@ -43,7 +43,7 @@ export default function BookingPopUp(props) {
         values.date = JSON.stringify(dateObj)
         values.patient = state.profile.id
         values.doctor = state.currentDoctor.id
-        dispatch(bookDoctor(values)).then(() => console.log("success")).catch((err)=>dispatch(setError(err.message)))
+        dispatch(bookDoctor(values)).then(() => console.log("success")).then(()=>props.setPopup(false)).catch((err)=>dispatch(setError(err.message)))
       }} >Book</button>
     </div>
   )
