@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, current } from "@reduxjs/toolkit";
-let baseURL = "https://consultation-app1.herokuapp.com/"
+let baseURL = "https://consultation-app.onrender.com"
 export const createUser = createAsyncThunk(
     "auth / signup",
     async (data) => {
